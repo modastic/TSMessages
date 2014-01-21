@@ -20,6 +20,8 @@
 /** The queued messages (TSMessageView objects) */
 @property (nonatomic, strong) NSMutableArray *messages;
 
++ (UIViewController *)defaultViewController;
+
 - (void)fadeInCurrentNotification;
 - (void)fadeOutNotification:(TSMessageView *)currentView;
 
@@ -96,6 +98,12 @@ __weak static UIViewController *_defaultViewController;
                               atPosition:(TSMessageNotificationPosition)messagePosition
                      canBeDismisedByUser:(BOOL)dismissingEnabled
 {
+    // Handle cases where view controller is presenting a modal view controller
+    UIViewController *actualViewController = viewController;
+    if (viewController.presentedViewController) {
+        actualViewController = viewController.presentedViewController;
+    }
+    
     // Create the TSMessageView
     TSMessageView *v = [[TSMessageView alloc] initWithTitle:title
                                                    subtitle:subtitle
