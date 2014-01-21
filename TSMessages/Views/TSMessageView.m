@@ -19,6 +19,9 @@
 
 static NSMutableDictionary *_notificationDesign;
 
+@interface TSMessage (TSMessageView)
+- (void)fadeOutNotification:(TSMessageView *)currentView; // private method of TSMessage, but called by TSMessageView in -[fadeMeOut]
+@end
 
 @interface TSMessageView () <UIGestureRecognizerDelegate>
 
@@ -322,11 +325,11 @@ static NSMutableDictionary *_notificationDesign;
             UITapGestureRecognizer *tapRec = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                                      action:@selector(fadeMeOut)];
             [self addGestureRecognizer:tapRec];
-
-            UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
-            tapGesture.delegate = self;
-            [self addGestureRecognizer:tapGesture];
         }
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+        tapGesture.delegate = self;
+        [self addGestureRecognizer:tapGesture];
     }
     return self;
 }
@@ -416,6 +419,9 @@ static NSMutableDictionary *_notificationDesign;
             float topOffset = 0.f;
 
             UINavigationController *navigationController = self.viewController.navigationController;
+            if (!navigationController && [self.viewController isKindOfClass:[UINavigationController class]]) {
+                navigationController = (UINavigationController *)self.viewController;
+            }
             BOOL isNavBarIsHidden = !navigationController || self.viewController.navigationController.navigationBarHidden;
             BOOL isNavBarIsOpaque = !self.viewController.navigationController.navigationBar.isTranslucent && self.viewController.navigationController.navigationBar.alpha == 1;
             
@@ -474,8 +480,6 @@ static NSMutableDictionary *_notificationDesign;
         {
             self.callback();
         }
-
-        [self fadeMeOut];
     }
 }
 
